@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hackathon Challenge Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background: linear-gradient(135deg, #e0f7fa, #fce4ec);
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #6a1b9a;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 600;
+      color: #4a148c;
+    }
+    textarea, input, select {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.4rem;
+      border-radius: 8px;
+      border: 1px solid #b39ddb;
+      font-size: 1rem;
+      background-color: #fafafa;
+    }
+    button {
+      margin-top: 1.5rem;
+      padding: 0.8rem 1.6rem;
+      background: linear-gradient(to right, #7b1fa2, #ab47bc);
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: linear-gradient(to right, #6a1b9a, #9c27b0);
+    }
+    #response {
+      margin-top: 2rem;
+      white-space: pre-wrap;
+      background: #ede7f6;
+      padding: 1rem;
+      border-radius: 8px;
+      border-left: 5px solid #7e57c2;
+      font-family: Consolas, monospace;
+      color: #4a148c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hackathon Challenge Generator</h1>
+
+    <label for="domain">Engineering Domain</label>
+    <input type="text" id="domain" placeholder="e.g. Robotics, AI, IoT, Biotech" />
+
+    <label for="difficulty">Difficulty Level</label>
+    <select id="difficulty">
+      <option value="Beginner">Beginner</option>
+      <option value="Intermediate">Intermediate</option>
+      <option value="Advanced">Advanced</option>
+    </select>
+
+    <label for="constraints">Special Constraints or Themes</label>
+    <textarea id="constraints" rows="4" placeholder="e.g. sustainability, low-cost, remote collaboration, etc."></textarea>
+
+    <button onclick="generateChallenge()">Generate Challenge</button>
+
+    <div id="response"></div>
+  </div>
+
+  <script>
+    async function generateChallenge() {
+      const domain = document.getElementById('domain').value;
+      const difficulty = document.getElementById('difficulty').value;
+      const constraints = document.getElementById('constraints').value;
+
+      let prompt = `Create an engineering challenge suitable for a hackathon.\n`;
+      if (domain.trim()) prompt += `Domain: ${domain}\n`;
+      if (difficulty.trim()) prompt += `Difficulty: ${difficulty}\n`;
+      if (constraints.trim()) prompt += `Constraints/Themes: ${constraints}\n`;
+      prompt += `\nThe challenge should be creative, feasible in a weekend, and open-ended enough to encourage innovation.`;
+
+      document.getElementById('response').innerText = 'Generating challenge...';
+
+      try {
+        const res = await fetch('http://localhost:5000/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+
+        const data = await res.json();
+        document.getElementById('response').innerText = data.response || data.error || 'No response received.';
+      } catch (error) {
+        document.getElementById('response').innerText = 'Error connecting to server.';
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>
